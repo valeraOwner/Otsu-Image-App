@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procesamiento de Imágenes con Otsu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../static/css/styles.css">
+
+</head>
+<body>
+    <div class="header">
+        <h1>Procesamiento de Imágenes</h1>
+        <p>Aplicación de algoritmo de Otsu para umbralización de imágenes</p>
+    </div>
+
+    <div class="container">
+        <!-- Mensajes de alerta -->
+        <div class="alert alert-error" id="errorAlert">
+            <i class="fas fa-exclamation-circle"></i>
+            <div id="errorMessage"></div>
+        </div>
+
+        <div class="alert alert-success" id="successAlert">
+            <i class="fas fa-check-circle"></i>
+            <div id="successMessage"></div>
+        </div>
+
+        <div class="image-processing-wrapper">
+            <div class="image-card">
+                <div class="card-header">
+                    <span>Imagen Original</span>
+                    <i class="fas fa-image"></i>
+                </div>
+                <div class="card-body">
+                    <!-- Pestañas para seleccionar origen de la imagen -->
+                    <div class="tabs">
+                        <div class="tab active" data-tab="upload">
+                            <i class="fas fa-upload"></i> Subir Imagen
+                        </div>
+                        <div class="tab" data-tab="server">
+                            <i class="fas fa-server"></i> Imágenes del Servidor
+                        </div>
+                        <div class="tab" data-tab="processed">
+                            <i class="fas fa-images"></i> Imágenes Procesadas
+                        </div>
+                    </div>
+
+                    <!-- Contenido de Subir Imagen -->
+                    <div class="tab-content active" id="upload-content">
+                        <div class="upload-area" id="uploadArea">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h4>Arrastra y suelta tu imagen aquí</h4>
+                            <p>O <span class="btn-link" id="browseBtn">selecciona un archivo</span></p>
+                            <p class="placeholder">Formatos aceptados: PNG, JPG, JPEG, GIF, BMP, WEBP</p>
+                            <input type="file" id="uploadInput" class="upload-input" accept="image/png, image/jpeg, image/jpg, image/gif, image/bmp, image/webp">
+                        </div>
+                    </div>
+
+                    <!-- Contenido de Imágenes del Servidor -->
+                    <div class="tab-content" id="server-content">
+                        <div class="control-wrapper">
+                            <div class="form-control">
+                                <label for="imageSelector">Seleccionar imagen</label>
+                                <select id="imageSelector">
+                                    <option value="">Seleccione una imagen...</option>
+                                    {% for image in images %}
+                                    <option value="{{ image }}">{{ image }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contenido de Imágenes Procesadas -->
+                    <div class="tab-content" id="processed-content">
+                        <button class="refresh-btn" id="refreshBtn">
+                            <i class="fas fa-sync-alt"></i> Actualizar lista
+                        </button>
+                        <div class="gallery" id="processedGallery">
+                            {% if processed_images %}
+                                {% for image in processed_images %}
+                                <div class="gallery-item" data-image="{{ image }}">
+                                    <img src="/get_processed_image/{{ image }}" alt="{{ image }}">
+                                    <div class="gallery-item-overlay">
+                                        {{ image }}
+                                        <div class="gallery-actions">
+                                            <button class="load-processed-btn" data-image="{{ image }}">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="gallery-empty">
+                                    <i class="fas fa-image"></i>
+                                    <p>No hay imágenes procesadas</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="image-preview" id="originalPreview">
+                        <div class="placeholder" id="originalPlaceholder">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Seleccione o arrastre una imagen para visualizar</p>
+                        </div>
+                        <img id="originalImage" src="" alt="Imagen original" style="display: none;">
+                        <div class="loader" id="originalLoader"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="image-card">
+                <div class="card-header">
+                    <span>Imagen Procesada</span>
+                    <i class="fas fa-image"></i>
+                </div>
+                <div class="card-body">
+                    <div class="control-wrapper">
+                        <div class="form-control">
+                            <button id="processButton" class="btn-primary" disabled>
+                                <span class="btn-text"><i class="fas fa-magic"></i> Aplicar Algoritmo de Otsu</span>
+                                <div class="loader"></div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="image-preview" id="processedPreview">
+                        <div class="placeholder" id="processedPlaceholder">
+                            <i class="fas fa-wand-magic-sparkles"></i>
+                            <p>La imagen procesada aparecerá aquí</p>
+                        </div>
+                        <img id="processedImage" src="" alt="Imagen procesada" style="display: none;">
+                        <div class="loader" id="processedLoader"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <h3><i class="fas fa-chart-line"></i> Información del Procesamiento</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Valor de umbral Otsu</div>
+                    <div class="info-value" id="thresholdValue">-</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tiempo de procesamiento</div>
+                    <div class="info-value" id="processingTime">- <small>ms</small></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Sistema Distribuido - Algoritmo de Otsu &copy; 2025</p>
+    </div>
+
+    <script src="/static/js/script.js"></script>
+</body>
+</html>

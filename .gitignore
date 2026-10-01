@@ -1,0 +1,35 @@
+# Entorno virtual
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Imágenes subidas por usuarios (no subir al repo)
+static/images/*
+static/processed/*
+
+# Mantener las carpetas vacías
+!static/images/.gitkeep
+!static/processed/.gitkeep
+
+# Variables de entorno
+.env
+*.env
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini

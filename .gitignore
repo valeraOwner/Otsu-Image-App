@@ -29,7 +29,6 @@ static/processed/*
 .idea/
 *.iml
 
-# Sistema operativo
 .DS_Store
 Thumbs.db
 desktop.ini

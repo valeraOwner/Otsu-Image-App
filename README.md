@@ -144,6 +144,3 @@ Este proyecto fue desarrollado con fines educativos para la asignatura de **Sist
 
 ---
 
-## 👤 Autor
-
-Desarrollado con ❤️ por **[Tu Nombre]**
